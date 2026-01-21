@@ -1,0 +1,77 @@
+SHOPS FORMAT - how to create a shop for `assets/shops/shops.json`
+
+Overview
+- Top-level structure: a JSON array of shop objects.
+- Each element in the array is one shop. Use the shop's array index to open it.
+
+Shop object fields
+- `name` (required)
+  - Type: string
+  - Display name of the shop.
+- `money` (required)
+  - Type: integer (number) or string `"infinite"`
+  - Shop funds. Use `"infinite"` to allow unlimited buying/selling.
+- `items` (required)
+  - Type: object (dictionary)
+  - Keys: item IDs (must match IDs from the items database).
+  - Values: item entries (see "Item entry" below).
+
+Important implementation note
+- In this project the shop loader converts each shop into an `Inventory` instance and calls `Inventory.load_data(shop)`. Because `ShopManager.require` expects each shop item to be a mapping (so it can call `.get("require", {})`), each shop item entry must be an object (not a raw integer). Use an object with at least a `quantity` field even when no `require` is needed.
+
+Item entry (per item in `items`)
+- `quantity` (required)
+  - Type: integer or string `"infinite"`
+  - How many units the shop has for that item.
+- `require` (optional)
+  - Type: object (dictionary) or falsy value (e.g. `{}` or `null` or `0`)
+  - If missing, empty or falsy, the item is always available.
+  - If present as a non-empty object, all keys in the object are evaluated; if any requirement fails the item is hidden.
+
+Supported `require` formats and semantics (as implemented by `ShopManager.require`)
+- General behavior:
+  - The code iterates `for key, value in require.items():` and tests each entry. All must pass for the item to be available.
+  - If `require` is empty/falsey, the item is available.
+
+- `player:has_item:ITEM_ID`
+  - Format: the requirement key is `"player:has_item:ITEM_ID"`
+  - Behavior: checks `player.inventory.items.get(ITEM_ID, 0) >= 1`.
+  - The associated requirement `value` is ignored by the current check (presence is tested).
+
+- `player:KEY`
+  - Format: key starts with `"player:"` and the rest is `KEY`
+  - Behavior: checks `player.ext_data.get(KEY) == value`.
+
+- `level:X`
+  - Format: requirement key begins with `"level:NUMBER"` (e.g. `"level:5"`)
+  - Behavior: the code parses the number from the key and checks `player.level >= NUMBER`. The `value` in the dict is not used.
+
+- Default (no recognized prefix)
+  - Format: `"flag_name": some_value`
+  - Behavior: checks `player.ext_data.get(flag_name) == some_value`.
+
+Notes about usage and caveats
+- Because of implementation details:
+  - Put item entries as objects with `quantity` and optional `require` (not bare integers).
+  - For level checks, place the number in the key (`"level:3"`) rather than the value.
+  - For item-presence checks, use the `player:has_item:ITEM_ID` key (or `player:has_item:ITEM_ID: true` — value is ignored).
+- Shop selection:
+  - Shops are accessed by index. Use `shop_manager.set_shop(index)` where `index` is the array position (0-based).
+- Item prices:
+  - Prices are read from the global items database (`assets/items/items.json`) via `ItemManager.get_item(...)`; do not put price inside shop item entries unless your game code has been extended to read it.
+- Example item entry forms:
+  - Always available, infinite stock:
+    { "quantity": "infinite" }
+  - Limited stock with no requirement:
+    { "quantity": 5 }
+  - Requires player level 3:
+    { "quantity": 2, "require": { "level:3": true } }
+  - Requires the player to own an item `guild_token`:
+    { "quantity": 1, "require": { "player:has_item:guild_token": true } }
+  - Requires a player flag `helped_smith` to equal `true`:
+    { "quantity": 1, "require": { "player:helped_smith": true } }
+
+Validation tips
+- Ensure JSON is well-formed (commas, braces).
+- Keep each shop item entry as an object with `quantity` when using `require`.
+- Test shops in-game by calling `shop_manager.set_shop(index)` to verify filtered lists appear as expected.

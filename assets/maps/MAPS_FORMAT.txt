@@ -1,0 +1,61 @@
+Maps are quite easy to make. It's a simple text file, translated to a double array of characters by the program.
+For the dimensions, you can choose the size you want but the max has to be the size of a screen you choose in the main.py, because if you dont and the terminal is not big enough it will crash.
+Dont forget to put a border tho it will disapear behind the screen border if you made the map as big as possible (it's pretty I promise).
+Here is an example of a simple map that was made:
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                                  │   │                              %
+%──────────────────┐               │   │                  ┌─────┐     %
+%            /\    └────────────┐  │   │    ┌─────────────┘     │     %
+%           /  \                └──┤   ├────┘     ▲             └─────%
+%          /────\                  │   │         /─\                  %
+%  ┌───┐   │    │─┌─┐                            │ │              ▲   %
+% <│ZOO│   │    │ │B│        *******             ├D┤             /─\  %
+%  └───┘   │    │ └─┘      *    ┌─┐  *                  ┬─┬      │ │  %
+%    │     │─DD─│        *             *                │ │      ├D┤  %
+%─ ─ ┴ ─                *       🌳£      *              🧍£ │           %
+%                      *     🌳£ 🌳£ 🌳£ ┌─┐*          N ====┴=          %
+%─ ─ ─ ─               *       ☭£  🌳£     *                     ▲      %
+%                      * ┌─┐   🌳£        *                    /─\     %
+%       ▲               *               *   ┌─Théâtre─┐       │ │     %
+%      /─\               *          ┌─┐*    │┌───────┐│       ├D┤     %
+%      │ │                 *         *      │~       │D               %
+%      ├D┤                   *******        └│┌─────┐│┘┐              %
+%                                                                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+Each map file is stored in assets/maps/ and is named with the map id (snake_case) followed by .txt
+For example the map above is stored in assets/maps/village2.txt
+
+You may have noticed multiple things. You have a lot of different characters, even unicode ones, and you have a lot of '£'.
+The map is not rectangular either.
+This is because of the unicode characters, they take 2 characters in the terminal but are registered as one character in the text file and the array.
+It leads to collisions problems, this is why we use '£' after unicode characters as the ui turns them into '' but the collision is still there. I did not find a better way for now so please if you want to use unicode, you can absolutelu but you HAVE TO had a '£' after each unicode character.
+Don't worry about the fact that the map is currently not rectangular, as the '£' are not visible, it looks rectangular in the end.
+
+By default, the walkable characters are:
+['.', ',', ';', ':', '*', ' '] so in our exemple, all the areas with '*' are walkable.
+For now, if you want to change the walkable characters, you have to do a self.walkable_tiles = [...] when you create your map function/class (Sorry for that I did not make a method to change that yet).
+
+Informations to add a map to the game are in extensions/data_extensions.py but here is a quick summary:
+you can either use a class or a function to create your map. I suggess using a function most of the time as it's easier but you have the choice. Use a class if you need special values or methods for your map.
+Either way, your map depend on the World class from engine/core/base.py so you have to import it.
+if you use a function, you have to return a World object.
+Here is an example of a map function:
+
+from engine.core.base import World
+def zooKeeperHouse(data):
+    self = World(data, "zooKeeperHouse", "assets/maps/zooKeeperHouse.txt")
+
+    self.add_entity(Entity(self, "door1Keeper", (14, 34), 'D',
+                           [Event(data, self, "door1Keeper", "ON_INTERACT", "MOVE",
+                                  target_scene="Zoo", target_position=(18, 55))]))
+    self.add_entity(Entity(self, "door2Keeper", (14, 35), 'D',
+                           [Event(data, self, "door2Keeper", "ON_INTERACT", "MOVE",
+                                  target_scene="Zoo", target_position=(18, 56))]))
+
+    self.add_entity(NPC(self, "zooKeeper", (8, 44), 'N', dialogue="assets/dialogues/test.json"))
+
+    return self
+Before we used classes for maps, that's why you see this "self" everywhere. You don't have to use it but if you wish to switch to a class later, you'll just have to change the def to class and add an __init__ method.
+I'll put a more complete method in another text file for the creation of maps.

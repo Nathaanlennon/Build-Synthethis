@@ -1,0 +1,24 @@
+Sprite are quite easy to make. It's a simple text file, translated to a double array of characters by the program.
+I strongly recommend using ascii characters however since the sprites are not meant to have any interaction with the player (I mean no moving and no collisions) you can use any characters you want.
+Unicode characters take two spaces so it makes things little weird but it messes up with the collision system so it should be fine here, however I never tried so I can't guarantee it will work perfectly.
+Here is an example of a bat that I made:
+
+ |\  /\_/\  /|
+/ˊ_\.`\¨/ˊ./_`\ 
+┐/ |`-┤ ├-ˊ| \┌
+ ┐/_┌-'T'-┐_\┌
+  ¯   / \   ¯
+
+Be aware that the sprite may change a little depending on the terminal parameters you have, it may look stretched or squished.
+
+Each sprite file is stored in assets/sprites/ and is named with the sprite id (snake_case) followed by .txt
+For example the bat sprite is stored in assets/sprites/bat.txt
+You can create your own sprites by making a text file and saving it in the assets/sprites/ folder.
+
+All the sprites are saved in the assets/sprites/ folder regardless of their type (enemies, npcs, etc).
+for npc sprite I recommand to use the maximum of space availabled by your screen size choice as in dialogues, all the top scene is used for the npc sprite.
+
+for enemies, in the combat system there is a var that define the maximum amount of enemies that can be displayed at once, so I recommand that you make your enemy sprites small enough to fit that maximum amount on the screen at once.
+By default the maximum amount of enemies displayed at once is 3, and they are placed side by side so the weidth of each enemy sprite should be at most one third of the scene width minus some space for padding.
+The ui system will center the enemies automatically so you don't have to worry about that. If you have an ennemy that is sure to be alone you can make it wider however.
+

@@ -1,6 +1,7 @@
 How to use the engine : 
 You must launch setup_environment.py at first, it may show an error but it's normal. The setup will create the necessary files and folders for the engine to work properly.
-Then, you can start creating your geme, everything is explained in the files created by setup_environment.py
+It will also provide you with explanation files for the different assets in assets/ folder. Read them to understand how to create your own assets and feel free to check the git hub repository for a simple exemple.
+Then, you can start creating your game, everything is explained in the files created by setup_environment.py
 
 
 # Core architecture — concise plan

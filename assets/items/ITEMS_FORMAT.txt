@@ -1,0 +1,103 @@
+ITEMS FORMAT - how to create an item for `assets/items/items.json`
+
+Structure
+- The file is a JSON object where each property key is the item's unique `id` (snake_case).
+- Each item value is an object describing that item.
+
+Top-level item fields (common)
+- `id` (required)
+  - Type: string
+  - Must match the parent key (unique identifier).
+- `name` (required)
+  - Type: string
+  - Display name (can contain spaces and accents).
+- `type` (required)
+  - Type: string (enum)
+  - Typical values: `equipment`, `consumable`, `junk`, `quest_item`.
+- `description` (optional)
+  - Type: string
+  - Short text describing the item.
+- `price` (optional)
+  - Type: integer (>= 0)
+  - Shop price or value.
+
+Equipment-specific
+- Applies when `type` == `equipment`.
+- `position` (required)
+  - Type: string
+  - Equipment slot, e.g., "weapon", "headgear", "chestplate", "leggings", "boots", "shield".
+- `damages` (optional, for weapons)
+  - Type: integer (>= 0)
+  - Attack power when equipped.
+
+Consumable-specific
+- Applies when `type` == `consumable`.
+- `effect` (optional)
+  - Type: object
+  - Contains one effect key such as:
+    - `heal`: integer (amount of HP restored).
+    - `damage`: integer (instant damage to target).
+
+Quest item / capacity items
+- Applies when `type` == `quest_item`.
+- `capacity` (optional)
+  - Type: object mapping internal ability keys to ability definitions.
+  - Each ability object typically has:
+    - `name`: string (display name of the ability).
+    - `damage`: integer (damage value).
+    - `accuracy`: number (0.0 to 1.0).
+not every quest item needs a capacity; some may just be keys for story progression.
+Capacities in quest items is more like a special case for items that grant abilities.
+In game logic it would be like if you want to give and retrieve abilities easily.
+Like a magician getting spells books or something
+
+Junk items
+- `type` == `junk`
+- Minimal fields commonly used: `id`, `name`, `description`, `price`.
+
+Validation rules / conventions
+- `id` must be unique and match the key string exactly.
+- Use snake_case for `id` and internal keys.
+- Numeric fields (`price`, `damages`, `damage`, `heal`) should be non-negative integers.
+- `accuracy` is a float between 0 and 1 (inclusive).
+- Keep JSON well-formed: use commas between properties, proper braces/brackets.
+
+Examples (minimal)
+- Equipment example:
+  {
+    "my_sword": {
+      "id": "my_sword",
+      "name": "My Sword",
+      "type": "equipment",
+      "position": "weapon",
+      "damages": 12,
+      "price": 40
+    }
+  }
+
+- Consumable example:
+  {
+    "small_potion": {
+      "id": "small_potion",
+      "name": "Small Potion",
+      "type": "consumable",
+      "effect": { "heal": 25 },
+      "price": 5
+    }
+  }
+
+- Quest item example:
+  {
+    "fire_tome": {
+      "id": "fire_tome",
+      "name": "Fire Tome",
+      "type": "quest_item",
+      "capacity": {
+        "fireball": { "name": "Fireball", "damage": 75, "accuracy": 0.8 }
+      }
+    }
+  }
+
+Notes
+- Add only the fields needed for the item's behavior; unused fields may be ignored by the game but keep data consistent.
+- When adding new fields or types, update game code that reads items accordingly.

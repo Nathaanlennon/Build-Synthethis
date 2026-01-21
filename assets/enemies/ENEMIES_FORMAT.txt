@@ -1,0 +1,60 @@
+ENEMIES FORMAT - how to create an enemy for `assets/enemies/enemies.json`
+
+Structure
+- The file is a JSON object where each property key is the enemy's unique `id` (snake_case).
+- Each enemy value is an object describing that enemy.
+
+Top-level enemy fields (common)
+- `id` (required)
+  - Type: string
+  - Must match the parent key (unique identifier).
+- `name` (required)
+  - Type: string
+  - Display name.
+- `hp` (required)
+  - Type: integer (>= 0)
+  - Hit points / health.
+- `damage` (required)
+  - Type: integer (>= 0)
+  - Base attack damage.
+- `defense` (optional)
+  - Type: integer (>= 0)
+  - Damage reduction when attacked.
+- `loot` (optional)
+  - Type: object
+  - Maps item_id to drop chance (0.0 - 1.0) or integer count.
+  - Example: { "iron_sword": 0.2, "gold_coin": 1 }
+
+Abilities
+- `abilities` (optional)
+  - Type: array of objects
+  - Each ability object:
+    - `name`: string
+    - `damage`: integer (>= 0)
+    - `accuracy`: number between 0.0 and 1.0
+
+Validation rules / conventions
+- Use snake_case for `id` and internal keys.
+- Numeric fields (`hp`, `damage`, `defense`) should be non-negative integers.
+- Drop chances are floats between 0 and 1 (inclusive).
+- Keep JSON well-formed: use commas between properties, proper braces/brackets.
+
+Examples (minimal)
+- Simple enemy:
+  {
+    "slime": {
+      "id": "slime",
+      "name": "Slime",
+      "hp": 8,
+      "damage": 3,
+      "defense": 1,
+      "loot": { "slime_gel": 0.7 },
+      "abilities": [
+        { "name": "Splash", "damage": 4, "accuracy": 0.9 }
+      ]
+    }
+  }
+
+Notes
+- Only include fields required by the game logic. Unused fields may be ignored.
+- When adding new fields, update game code that reads `assets/enemies/enemies.json`.

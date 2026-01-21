@@ -202,11 +202,14 @@ class World:
             with open(self.map, 'r', encoding='utf-8') as file:
                 map_data = [line.rstrip('\n') for line in file]
             return map_data
-        else:
+        elif os.path.exists("assets/maps/default_map.txt") and os.path.isfile("assets/maps/default_map.txt"):
             with open("assets/maps/default_map.txt", 'r', encoding='utf-8') as file:
                 map_data = [line.rstrip('\n') for line in file]
             logger.warning(f"Fichier de map introuvable : {self.map}, chargement de la map par défaut.")
             return map_data
+        else:
+            logger.error(f"Fichier de map introuvable : {self.map}, et map par défaut également absente.")
+            return ["#####","#   #","#   #","#   #","#####"]  # return a default empty map
 
     def is_walkable(self, tile):
         y, x = tile

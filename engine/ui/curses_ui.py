@@ -81,7 +81,6 @@ def dialogue_mode(self, stdscr):
 def inventory_mode(self, stdscr):
     if not item_list_renderer.focused:
         self.render_item_list(stdscr, "hud", f"[{item_list_renderer.name}]")
-        # I want you to add a line in the last line to indicate to the user that he can press tab to change to the other inventary, not a button please
         if dealItem.mode != "use":
             self.draw(stdscr, "hud", self.screens["hud"]["size"][0]-2, 1, "TAB to switch")
             money = 'ထ ' if shop_manager.current_shop.money == 'infinite' else shop_manager.current_shop.money

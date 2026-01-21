@@ -1,0 +1,144 @@
+DIALOGUES FORMAT - how to create a dialogue file for `assets/dialogues/*.json`
+
+Structure
+- The file is a JSON array. Each array element is a dialogue node.
+- Nodes are referenced by their array index. Use integer `next` values in options to jump to another node.
+- Use `-1` to indicate the conversation ends / UI closes.
+
+Node fields (common)
+- `speaker` (optional)
+  - Type: string
+  - Display name of the speaker (e.g. "PNJ", "Hero"). May be omitted for narration.
+  speaker allows to show the sprite of the speaker, the name has to match an entry in assets/sprites/
+- `text` (required)
+  - Type: string
+  - The message shown to the player. Can contain newlines. Long text is allowed. The ui will handle wrapping/scrolling so don't worry about it.
+- `require` (optional)
+  - Type: dictionary
+  - Conditions can be multiples, all in the dictionnary
+  - multiple conditions exists, like a boolen check on flags, or custom checks (like item presence)
+  - they work with prefixes for universe and the player but can also work without (always in the player data then)
+  - Exemple :
+  require: { "has_key": true, "universe:quest_started": true }
+  for the flags there are rules, they will be written in the end of this document
+  - Keys are game flags or checks. Examples:
+    - `"insulted_npc": true` (flag must be true)
+    - `"has_item:health_potion": true` (custom check for item presence)
+  - If `require` is omitted or `null`, the node is always available.
+- `effects` (optional)
+  - Type: dictionary
+  - Applied when the node is reached (or when an option with `effects` is chosen).
+  - Keys set or modify game state. Examples:
+    - `"insulted_npc": false` (set a flag)
+    - `"shop": 0` (trigger shop state), the value is the shop id from assets/shops/shops.json
+    - `"mode": "inventory"` (change UI mode),
+
+Options (player choices)
+- `options` (optional)
+  - Type: array of option objects.
+  - If omitted, the node is terminal.
+- Each option object:
+  - `text` (required) — string shown on the choice button.
+  - `next` (required) — integer index of the next node, or `-1` to close.
+  - `require` (optional) — conditions for the choice to be shown (same format as node `require`).
+  - `effects` (optional) — object applied when this option is chosen (same format as node `effects`).
+
+
+DIALOGUE PREFIXES — require and effects
+
+    Common prefixes (merged where behavior overlaps)
+
+    player:
+      - Require:
+        - Format: `player:KEY` or `player:has_item:ITEM_ID`
+        - Behavior: `player:has_item:ITEM_ID` checks `universe.player.inventory.items[ITEM_ID] >= 1`.
+          Otherwise checks `universe.player.ext_data[KEY] == value`.
+      - Effects:
+        - Format: `player:KEY`
+        - Behavior: sets `universe.player.ext_data[KEY] = value`.
+
+    universe:
+      - Require:
+        - Format: `universe:KEY`
+        - Behavior: checks `universe.ext_data[KEY] == value`.
+      - Effects:
+        - Format: `universe:KEY`
+        - Behavior: sets `universe.ext_data[KEY] = value`.
+
+    has_item:
+      - Require only:
+        - Format: `has_item:ITEM_ID`
+        - Behavior: checks `universe.player.inventory.items[ITEM_ID] >= 1`.
+
+    give_item:
+      - Effects only:
+        - Format: `give_item:ITEM_ID`
+        - Behavior: if `int(value) > 0` calls `universe.player.inventory.add_item(ITEM_ID, int(value))`.
+        exemple : `{"give_item:health_potion": 3}` gives 3 health potions.
+        Note that the item id will be added to the player inventory regardless of its existence in assets/items/items.json
+        (if an item id is invalid, trying to access to it later like opening the inventory will add an entry to the logger)
+
+    remove_item:
+      - Effects only:
+        - Format: `remove_item:ITEM_ID`
+        - Behavior: current logic only calls removal when `int(value) < 0` and does
+          `universe.player.inventory.remove_item(ITEM_ID, value)` (note: expects positive values).
+
+    Special effect keys (no prefix)
+      - `heal` → calls `universe.player.heal(int(value))`.
+      - `shop` → calls `shop_manager.set_shop(value)` and start a shop interaction.
+      - `mode` → calls `universe.mode_change(value)`. Pre-existing modes: `"inventory"`, `"dialogue"`, `"exploration"`, `"combat"`.
+      But you can add any mode you want, check the extensions files to learn more about it.
+
+    Default (no prefix and not a special key)
+      - Require:
+        - Behavior: treated as `universe.player.ext_data[KEY] == value`.
+      - Effects:
+        - Behavior: stores `universe.player.ext_data[KEY] = value`.
+
+    Examples
+      - Require inventory: `{"has_item:health_potion": true}` or `{"player:has_item:health_potion": true}`
+      - Effect give item: `{"give_item:gold_coin": 5}`
+      - Effect set flag: `{"player:helped_npc": true}`
+      - Effect open shop: `{"shop": 0}`
+
+    Notes
+      - Prefixes modify where keys are looked up or written (player ext_data vs universe ext_data).
+
+
+Semantics / conventions
+- Keep dialogue nodes in stable order; changing node order changes `next` targets.
+- Use consistent flag names (snake_case recommended).
+- `require` entries are checked as boolean or via project-specific handlers (e.g. item checks).
+- `effects` values may be boolean, numeric, or string depending on your needs.
+    Be aware that most of the time, the values will be stored in ext_data, either in player or universe scope.
+- Use `-1` for immediate end/close
+
+Examples (minimal)
+- Simple node with two options:
+  {
+    "speaker": "PNJ",
+    "text": "Bonjour. Que voulez-vous ?",
+    "options": [
+      { "text": "Rien.", "next": -1 },
+      { "text": "Parler.", "next": 1 }
+    ]
+  }
+
+- Node with requirement and effects:
+  {
+    "require": { "insulted_npc": true },
+    "speaker": "PNJ",
+    "text": "Tu m'as insulté !",
+    "options": [
+      {
+        "text": "Désolé.",
+        "next": -1,
+        "effects": { "insulted_npc": false }
+      }
+    ]
+  }
+
+Notes
+- When adding new condition/ effect keys, ensure game code can interpret them.
+- Validate JSON (array of nodes) and keep strings properly escaped.
