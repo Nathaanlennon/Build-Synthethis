@@ -17,7 +17,7 @@ python -m pip install windows-curses
 ```
 
 run : 
-When you want to launch your project, go on the project repository and run the [launch_game.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/launch_game.py) file. DO NOT run [main.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/main.py) directly, has arguments are needed to launch the game properly.
+When you want to launch your project, go on the project repository and run the [launch_game.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/launch_game.py) file. DO NOT run [main.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/main.py) directly, as arguments are needed to launch the game properly.
 ```bash
 py -3 [launch_game.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/launch_game.py)
 ```
@@ -32,7 +32,7 @@ python3 [launch_game.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/
 You must launch [setup_environment.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/setup_environment.py) at first, it may show an error but it's normal. The setup will create the necessary files and folders for the engine to work properly.
 It will also provide you with explanation files for the different assets in [assets/](https://github.com/Nathaanlennon/Build-Synthethis/tree/main/assets) folder. Read them to understand how to create your own assets and feel free to check the git hub repository for a simple exemple.
 Check the [engine/README.md](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/README.md) file for more information about the core architecture of the engine.
-Please check the [extensions/](https://github.com/Nathaanlennon/Build-Synthethis/tree/main/extensions) folder as there is some important informations about how to had things, including your different worlds. For a simple rpg, the only code you have to do is to have your worlds functions and add the worlds in [extensions/data_extensions.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/extensions/data_extensions.py) accordingly to the explanations in the file.
+Please check the [extensions/](https://github.com/Nathaanlennon/Build-Synthethis/tree/main/extensions) folder as there is some important informations about how to add things, including your different worlds. For a simple rpg, the only code you have to make is to create your worlds functions and add the worlds in [extensions/data_extensions.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/extensions/data_extensions.py) accordingly to the explanations in the file.
 The rest will just be adding your stuff in the [assets/](https://github.com/Nathaanlennon/Build-Synthethis/tree/main/assets) folder.
 
 
@@ -173,12 +173,12 @@ When you run the [setup_environment.py](https://github.com/Nathaanlennon/Build-S
 Please check them for more information about assets.
 
 ## Engine : 
-The engine is separeted between the core and the ui and are kinda fully independant, so you can create your own ui if you want to. However you will need to recreate some mandatory methods to make it work properly.
-The ui is currently based on the curses library, so you can check the [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py) file to understand how it works and maybe create your own ui based on it.
-As I created a specific file for curses ui, you can make another ui based on whatever you want and call this instead of [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py) in the main.
+The engine is separeted between the core and the UI and are kinda fully independant, so you can create your own UI if you want to. However you will need to recreate some mandatory methods to make it work properly.
+The UI is currently based on the curses library, so you can check the [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py) file to understand how it works and maybe create your own UI based on it.
+As I created a specific file for curses ui, you can make another UI based on whatever you want and call this instead of [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py) in the main.
 
-The game engine works with a modes system, such as exploration mode, dialogue mode, combat mode, etc... Each mode function operate with a commun couple : an input mode in [engine/core/InputSystem.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/core/InputSystem.py) and a render mode in [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py). Each mode part, either ui or input has a reference in a dictionnary. The name is very important as it's a key used by the universe so make sure that your ui and your input has the same reference name in the dictionnary. 
-For example, the exploration mode is referenced as "exploration" in both the ui and input dictionnary. So when the universe switch to exploration mode, both the input system and the ui will switch to their respective exploration mode part.
+The game engine works with a modes system, such as exploration mode, dialogue mode, combat mode, etc... Each mode function operate with a commun couple : an input mode in [engine/core/InputSystem.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/core/InputSystem.py) and a render mode in [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py). Each mode part, either UI or input has a reference in a dictionnary. The name is very important as it's a key used by the universe so make sure that your UI and your input have the same reference name in the dictionnary. 
+For example, the exploration mode is referenced as "exploration" in both the UI and input dictionnary. So when the universe switch to exploration mode, both the input system and the UI will switch to their respective exploration mode part.
 You can check both the [engine/core/InputSystem.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/core/InputSystem.py) and [engine/ui/curses_ui.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/engine/ui/curses_ui.py) files to understand how the modes work and maybe create your own modes if you want to.
 You can create your own modes in [extensions/mode_extensions.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/extensions/mode_extensions.py) and [extensions/ui_extensions.py](https://github.com/Nathaanlennon/Build-Synthethis/blob/main/extensions/ui_extensions.py) files. Everything is explained in the files.
 You can as well rewrite over the pre-existing modes if you wish so, exactly the same way as you add new modes but you put the same key as the pre-existing mode you want to overwrite.
@@ -186,7 +186,7 @@ You can as well rewrite over the pre-existing modes if you wish so, exactly the 
 There is a readme file in the [engine/](https://github.com/Nathaanlennon/Build-Synthethis/tree/main/engine/) folder that explain the core architecture of the engine if you want to understand better how it works.
 
 ### UI : 
-The ui is screen based, what I mean by that is that there is multiple screens where the stuff is drew. By default, you have two screens positionned one on top of each other : the game screen and the info screen.
+The UI is screen based, what I mean by that is that there is multiple screens where the stuff is drew. By default, you have two screens positionned one on top of each other : the game screen and the info screen.
 When something is written, the screen is given and the local coordinates. It means that the coordinates you chose is based on the screen, not the terminal.
 For exemple you have a screen that is positionned in 2,4, and you want to write something in the left corner of this screen passed the border, you will have to give 1,1 coordinates and not 3,5.
 It means that you can move the screen and everything will stay in place.
